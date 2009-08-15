@@ -179,8 +179,12 @@ module Sprinkle
         @installer = Sprinkle::Installers::PushText.new(self, text, path, options, &block)
       end
 
-			def transfer(source, destination, options = {}, &block)
-				@installer = Sprinkle::Installers::Transfer.new(self, source, destination, options, &block)
+      def replace_text(regex, text, path, options={}, &block)
+        @installer = Sprinkle::Installers::ReplaceText.new(self, regex, text, path, options, &block)
+      end
+
+	  def transfer(source, destination, options = {}, &block)
+		@installer = Sprinkle::Installers::Transfer.new(self, source, destination, options, &block)
       end
 
       def verify(description = '', &block)
