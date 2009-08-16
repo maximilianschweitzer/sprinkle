@@ -33,11 +33,11 @@ describe Sprinkle::Installers::ReplaceText do
     end
 
     it 'should invoke the replace text installer for all specified packages' do
-      @install_commands.should == %q[sed -i '2{s/bad option/super option/g}' /etc/brand/new.conf]
+      @install_commands.should == %q[sed -i 's/bad option/super option/' /etc/brand/new.conf]
     end
 
     it 'should automatically insert pre/post commands for the specified package' do
-      @installer.send(:install_sequence).should == [ 'op1', "sed -i '2{s/bad option/super option/g}' /etc/brand/new.conf", 'op2' ]
+      @installer.send(:install_sequence).should == [ 'op1', "sed -i 's/bad option/super option/' /etc/brand/new.conf", 'op2' ]
     end
 
   end
