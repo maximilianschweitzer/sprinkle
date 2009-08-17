@@ -14,6 +14,12 @@ module Sprinkle
     #     uncomment_line 'jaunty.*multiverse', '/etc/apt/sources.list'
     #   end
     #
+    # You can also uncomment multiple lines with different regex in one file
+    #
+    #   package :magic_beans do
+    #     uncomment_line [ 'jaunty.*multiverse', 'jaunty.*partner' ], '/etc/apt/sources.list'
+    #   end
+    #
     # If you user has access to 'sudo' and theres a file that requires
     # priveledges, you can pass :sudo => true 
     #
@@ -28,7 +34,7 @@ module Sprinkle
     class UncommentLine < Installer
       attr_accessor :regex, :path #:nodoc:
 
-      def initialize(parent, text, path, options={}, &block) #:nodoc:
+      def initialize(parent, regex, path, options={}, &block) #:nodoc:
         super parent, options, &block
         @regex = regex
         @path = path
@@ -37,10 +43,19 @@ module Sprinkle
       protected
 
         def install_commands #:nodoc:
-          logger.info "--> Uncomment lines which contains '#{@regex}' in file #{@path}"
-          "#{'sudo' if option?(:sudo)} sed -i 's/#\\(.*#{@regex.gsub("'", "'\\\\''").gsub("/", "\\\\/").gsub("\n", '\n')}.*\\)/\\1/' #{@path}"
+          command = ""
+          if @regex.kind_of? Array
+             @regex.each {|current_regex| command += uncomment(current_regex) + "; "}
+          else
+             command = uncomment(@regex)
+          end
+          return command
         end
-
+        
+        def uncomment(regex) #:nodoc:
+            logger.info "--> Uncomment lines which contains '#{regex}' in file #{@path}"
+            "#{'sudo' if option?(:sudo)} sed -i 's/#\\(.*#{regex.gsub("'", "'\\\\''").gsub("/", "\\\\/").gsub("\n", '\n')}.*\\)/\\1/' #{@path}"
+        end
     end
   end
 end
